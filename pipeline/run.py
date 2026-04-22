@@ -9,6 +9,10 @@ Usage:
         --out examples/outputs
 
 Stages can also be run individually for debugging — see `jolto --help`.
+
+The only dispatch the CLI does is `registry.build(model_id, kind=..., env=...)`.
+Everything else reads the ShotGraph and passes a `FrameBackend` or
+`VideoBackend` into the stage orchestrator.
 """
 
 from __future__ import annotations
@@ -23,28 +27,21 @@ from rich.console import Console
 from rich.table import Table
 
 from .brief_parser import parse_brief
-from .config import is_fal_frame_model, is_fal_video_model, load_config
+from .config import BRIEF_UNIT_COST_USD, load_config
 from .frame_gen import generate_keyframes
-from .identity.base import IdentityModule
-from .identity.gemini_direct import GeminiDirectIdentity
-from .identity.mock import MockIdentity
-from .identity.product import ProductIdentity
-from .schema import Aesthetic, AspectRatio, CostRecord, ProductRef, RunArtifacts, RunOptions, ShotGraph
+from .providers import ProviderKind, registry
+from .schema import (
+    Aesthetic,
+    AspectRatio,
+    CostRecord,
+    ProductRef,
+    RunArtifacts,
+    RunOptions,
+    ShotGraph,
+)
 from .shot_planner import plan_shots
 from .stitch import stitch as stitch_clips
 from .video_gen import generate_clips
-from .video_gen_gemini import generate_clips_gemini
-from .video_gen_mock import generate_clips_mock
-
-
-def _select_identity(cfg) -> IdentityModule:
-    if cfg.frame_model == "mock":
-        return MockIdentity()
-    if is_fal_frame_model(cfg.frame_model):
-        return ProductIdentity(model=cfg.frame_model, fal_key=cfg.fal_key)
-    if not cfg.gemini_api_key:
-        raise RuntimeError("Gemini-direct frame model selected but GEMINI_API_KEY is missing.")
-    return GeminiDirectIdentity(api_key=cfg.gemini_api_key, model=cfg.frame_model)
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 console = Console()
@@ -81,7 +78,10 @@ def _print_plan(graph: ShotGraph) -> None:
     table.add_column("camera")
     table.add_column("intent")
     for s in graph.ordered_shots():
-        table.add_row(s.id, str(s.order), f"{s.duration_s:.1f}s", s.framing.value, s.camera.value, s.intent)
+        table.add_row(
+            s.id, str(s.order), f"{s.duration_s:.1f}s",
+            s.framing.value, s.camera.value, s.intent,
+        )
     console.print(table)
 
 
@@ -97,9 +97,9 @@ def run(
     skip_video: bool = typer.Option(False, "--skip-video", help="Stop after keyframes."),
     qa_threshold: float = typer.Option(0.65, help="CLIP similarity pass threshold."),
     max_retries: int = typer.Option(2, help="Max retries per keyframe on QA failure."),
-    aspect_ratio: AspectRatio = typer.Option(AspectRatio.LANDSCAPE, "--aspect-ratio", help="16:9, 9:16, or 1:1."),
-    duration: int = typer.Option(15, "--duration", min=5, max=30, help="Target total runtime in seconds."),
-    aesthetic: Aesthetic = typer.Option(Aesthetic.CINEMATIC, "--aesthetic", help="Visual preset."),
+    aspect_ratio: AspectRatio = typer.Option(AspectRatio.LANDSCAPE, "--aspect-ratio"),
+    duration: int = typer.Option(15, "--duration", min=5, max=30),
+    aesthetic: Aesthetic = typer.Option(Aesthetic.CINEMATIC, "--aesthetic"),
 ) -> None:
     """Full pipeline: brief -> shot graph -> keyframes -> clips -> stitched MP4."""
 
@@ -112,7 +112,10 @@ def run(
         target_duration_s=duration,
         aesthetic=aesthetic,
     )
+    frame_provider = cfg.frame_provider()
+    video_provider = cfg.video_provider()
 
+    # Stage 1 —------------------------------------------------------
     console.rule("[bold]1. Parse brief[/]")
     graph = parse_brief(
         brief_text=brief.read_text(),
@@ -131,22 +134,23 @@ def run(
             stage="brief",
             model=cfg.brief_model,
             units=1,
-            unit_cost_usd=cfg.brief_pricing.unit_cost_usd,
+            unit_cost_usd=BRIEF_UNIT_COST_USD,
         )
     )
 
+    # Stage 2 —------------------------------------------------------
     console.rule("[bold]2. Plan shots[/]")
     graph = plan_shots(graph, options)
     _print_plan(graph)
-
     artifacts.shot_graph_path.write_text(graph.model_dump_json(indent=2))
     console.log(f"shot graph -> {artifacts.shot_graph_path}")
 
+    # Stage 3+4 —----------------------------------------------------
     console.rule("[bold]3+4. Generate keyframes (with product-fidelity QA)[/]")
-    identity = _select_identity(cfg)
+    frame_backend = registry.build(cfg.frame_model, kind=ProviderKind.FRAME, env=cfg.env)
     graph = generate_keyframes(
         graph,
-        identity,
+        frame_backend,
         artifacts.keyframes_dir,
         max_retries=max_retries,
         qa_threshold=qa_threshold,
@@ -157,8 +161,8 @@ def run(
             CostRecord(
                 stage="frame",
                 model=cfg.frame_model,
-                units=shot.qa_attempts,
-                unit_cost_usd=cfg.frame_pricing.unit_cost_usd,
+                units=shot.qa_attempts or 1,
+                unit_cost_usd=frame_provider.unit_cost_usd,
             )
         )
 
@@ -170,48 +174,38 @@ def run(
         console.log("[yellow]--skip-video set; stopping after keyframes.")
         return
 
+    # Cost ceiling guard --------------------------------------------
+    projected_video = video_provider.unit_cost_usd * len(graph.shots)
     total_so_far = sum(r.total_usd for r in cost_records)
-    projected_video = cfg.video_pricing.unit_cost_usd * len(graph.shots)
     if total_so_far + projected_video > cfg.cost_ceiling_usd:
         raise typer.BadParameter(
-            f"Projected total ${total_so_far + projected_video:.2f} exceeds ceiling "
-            f"${cfg.cost_ceiling_usd:.2f}. Raise JOLTO_COST_CEILING_USD to continue."
+            f"Projected total ${total_so_far + projected_video:.2f} exceeds "
+            f"ceiling ${cfg.cost_ceiling_usd:.2f}. "
+            f"Raise JOLTO_COST_CEILING_USD to continue."
         )
 
+    # Stage 5 —------------------------------------------------------
     console.rule("[bold]5. Image-to-video[/]")
-    if cfg.video_model == "mock":
-        graph = generate_clips_mock(
-            graph, artifacts.clips_dir, aspect_ratio=options.aspect_ratio.value
-        )
-    elif is_fal_video_model(cfg.video_model):
-        graph = generate_clips(
-            graph,
-            artifacts.clips_dir,
-            model=cfg.video_model,
-            fal_key=cfg.fal_key,
-            aspect_ratio=options.aspect_ratio.value,
-        )
-    else:
-        graph = generate_clips_gemini(
-            graph,
-            artifacts.clips_dir,
-            api_key=cfg.gemini_api_key,
-            model=cfg.video_model,
-            aspect_ratio=options.aspect_ratio.value,
-        )
+    video_backend = registry.build(cfg.video_model, kind=ProviderKind.VIDEO, env=cfg.env)
+    graph = generate_clips(
+        graph,
+        video_backend,
+        artifacts.clips_dir,
+        aspect_ratio=options.aspect_ratio.value,
+    )
     for _ in graph.shots:
         cost_records.append(
             CostRecord(
                 stage="video",
                 model=cfg.video_model,
                 units=1,
-                unit_cost_usd=cfg.video_pricing.unit_cost_usd,
+                unit_cost_usd=video_provider.unit_cost_usd,
             )
         )
-
     artifacts.shot_graph_path.write_text(graph.model_dump_json(indent=2))
     _write_cost_log(artifacts.cost_log_path, cost_records)
 
+    # Stage 6 —------------------------------------------------------
     console.rule("[bold]6. Stitch[/]")
     stitch_clips(graph, artifacts.final_video_path)
 
@@ -236,7 +230,6 @@ def plan_only(
 
     cfg = load_config()
     artifacts = _init_run_dir(out)
-
     options = RunOptions(
         aspect_ratio=aspect_ratio,
         target_duration_s=duration,

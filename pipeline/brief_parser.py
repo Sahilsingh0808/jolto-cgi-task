@@ -92,11 +92,12 @@ def parse_brief(
 ) -> ShotGraph:
     """Call Gemini to turn the brief + product image into a ShotGraph."""
 
-    if not config.gemini_api_key:
+    api_key = config.env.get("GEMINI_API_KEY")
+    if not api_key:
         raise RuntimeError("GEMINI_API_KEY not set; cannot parse brief.")
 
     options = options or RunOptions()
-    client = genai.Client(api_key=config.gemini_api_key)
+    client = genai.Client(api_key=api_key)
 
     product_bytes = product.image_path.read_bytes()
     parts: list[types.Part | str] = [

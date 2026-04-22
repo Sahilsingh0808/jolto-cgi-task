@@ -69,24 +69,56 @@ all work.
 
 ### The one abstraction that makes the whole thing extensible
 
+The pipeline has a **provider registry** at
+[`pipeline/providers/`](../pipeline/providers/). Every image/video model
+from every vendor is registered here. Two Protocols define the contract:
+
 ```python
-class IdentityModule(Protocol):
-    def generate(self, request: IdentityRequest) -> IdentityResult: ...
+class FrameBackend(Protocol):
+    model: str
+    def generate(self, request: FrameRequest) -> FrameResult: ...
+
+class VideoBackend(Protocol):
+    model: str
+    def generate(self, request: VideoRequest) -> VideoResult: ...
 ```
 
-An `IdentityModule` takes a reference image (the identity to preserve) and a
-text prompt, and produces an image that keeps the reference identity but
-looks like the prompt. That's it.
+Each provider is declared as data:
 
-For CGI the identity is the **product**. I have three implementations:
+```python
+Provider(
+    id="veo-3.0-generate-001",
+    kind=ProviderKind.VIDEO,
+    backend="gemini-veo",
+    unit="clip", unit_cost_usd=4.50,
+    requires_env=["GEMINI_API_KEY"],
+    tags=["gemini", "veo"],
+)
+```
 
-- `ProductIdentity` — Flux Kontext or Nano Banana via fal.ai
-- `GeminiDirectIdentity` — Nano Banana via Google GenAI SDK
-- `MockIdentity` — offline PIL transforms for free demos
+Dispatch is one line: `registry.build(model_id, kind=..., env=...)` returns
+the right backend instance. No string-prefix switches, no if/elif chains.
 
-**The lifestyle extension is the same interface with a different
-implementation:** a `CharacterIdentity` that preserves a human face. The
-pipeline wouldn't change. That's the thesis of the design.
+### Adding a new vendor is one file
+
+To add Runway, Pika, Luma, or any future provider:
+
+1. Create `pipeline/providers/<vendor>.py`. Define a `XxxBackend` class
+   with `generate()`. Register the backend + provider entries.
+2. Add `from . import <vendor>` to `providers/__init__.py`.
+
+**Nothing else changes.** The UI dropdown auto-populates, pricing flows
+through the cost estimate, env validation triggers, and the orchestrator
+dispatches correctly. See [`docs/EXTENSIONS.md`](EXTENSIONS.md) for a
+worked Runway example.
+
+### Why this is the right shape for a fast-moving AI industry
+
+A new SOTA video model drops every ~6 weeks. The work to adopt it in this
+pipeline is: write an adapter (~100 lines, if the SDK is clean) + register
+it (5 lines). The rest of the codebase — 2,000+ lines of orchestrator,
+schema, web UI — stays untouched. That's the reason this architecture was
+chosen over hardcoded dispatch.
 
 ---
 

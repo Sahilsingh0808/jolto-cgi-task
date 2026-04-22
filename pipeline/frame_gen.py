@@ -1,15 +1,18 @@
 """Stage 3 + 4: Frame generation with QA-driven retry.
 
-For each shot, generate a keyframe using the configured IdentityModule, then
-measure product fidelity against the original reference. Retry up to
-`max_retries` times on failure. The best-scoring attempt is kept regardless
-of whether any attempt crossed the pass threshold — a below-threshold best
-attempt is more useful for the downstream video stage than failing the run.
+Orchestrator. Knows nothing about which provider is being used — just
+drives a `FrameBackend` from `pipeline.providers`. Every frame-generation
+provider flows through this same loop.
 
-If the generator raises (text-only response, safety block, transient error),
-that attempt is logged as failed and the retry continues. If every attempt
-fails, the reference product image is copied as the keyframe as a last
-resort so the pipeline still produces a complete output.
+For each shot:
+  1. Call `backend.generate()` with a per-shot FrameRequest.
+  2. Measure product fidelity against the original reference.
+  3. Retry up to `max_retries` times on failure (new seed each attempt).
+  4. Keep the best-scoring attempt regardless of threshold — a below-
+     threshold keyframe is more useful to the downstream video stage than
+     failing the whole run.
+  5. If every attempt crashes (safety block, 429, etc), fall back to a
+     copy of the reference image so the pipeline still finishes.
 """
 
 from __future__ import annotations
@@ -20,7 +23,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from .identity.base import IdentityModule, IdentityRequest
+from .providers import FrameBackend, FrameRequest
 from .qa import QAResult, product_fidelity
 from .schema import ShotGraph
 
@@ -29,15 +32,13 @@ console = Console()
 
 def generate_keyframes(
     graph: ShotGraph,
-    identity: IdentityModule,
+    backend: FrameBackend,
     keyframes_dir: Path,
     *,
     max_retries: int = 2,
     qa_threshold: float = 0.65,
     aspect_ratio: str = "16:9",
 ) -> ShotGraph:
-    """Generate one keyframe per shot, in-place annotating the graph."""
-
     keyframes_dir.mkdir(parents=True, exist_ok=True)
     ref = graph.product.image_path
 
@@ -55,8 +56,8 @@ def generate_keyframes(
                 f"[cyan]{shot.id}[/] frame attempt {attempt + 1}/{attempts_total}"
             )
             try:
-                identity.generate(
-                    IdentityRequest(
+                backend.generate(
+                    FrameRequest(
                         prompt=shot.frame_prompt,
                         reference_image_path=ref,
                         out_path=out_path,

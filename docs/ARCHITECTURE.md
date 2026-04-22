@@ -56,28 +56,90 @@ Stage numbers match the assignment brief's "Core Production Pipeline" table.
 Stage 4 (scene breakdown) is absorbed into the planner because the shot graph
 already carries the scene information.
 
-## The core abstraction: `IdentityModule`
+## The core abstraction: the provider registry
+
+Every frame-generation and video-generation model is a **Provider**. Every
+Provider is handled by a **Backend** that implements one of two Protocols.
+Both live in [`pipeline/providers/`](../pipeline/providers/).
 
 ```python
-class IdentityModule(Protocol):
-    name: str
-    def generate(self, request: IdentityRequest) -> IdentityResult: ...
+class FrameBackend(Protocol):
+    model: str
+    def generate(self, request: FrameRequest) -> FrameResult: ...
+
+class VideoBackend(Protocol):
+    model: str
+    def generate(self, request: VideoRequest) -> VideoResult: ...
+
+class Provider(BaseModel):
+    id: str                    # user-facing model id, e.g. "veo-3.0-generate-001"
+    kind: ProviderKind         # FRAME | VIDEO | BRIEF
+    backend: str               # implementation key; many providers can share one
+    unit: str                  # "image" | "clip"
+    unit_cost_usd: float
+    requires_env: list[str]    # e.g. ["GEMINI_API_KEY"]
+    tags: list[str]            # e.g. ["gemini", "veo", "fast"]
 ```
 
-An `IdentityModule` generates an image conditioned on a reference image (the
-identity to preserve) plus a text prompt. That's it.
+At import time, each file in `pipeline/providers/` (one per vendor) registers
+its backend(s) and provider entries with a module-level `Registry`. The
+rest of the codebase only ever touches the registry:
 
-For CGI the identity is the product. Three implementations exist today:
+- The run orchestrator: `registry.build(model_id, kind=..., env=...)` to
+  get a backend instance.
+- The web API: `registry.list(ProviderKind.VIDEO)` to build the UI dropdown
+  and cost table.
+- Config validation: `registry.get(model_id, kind)` fails fast if someone
+  sets `JOLTO_VIDEO_MODEL=typo123`.
 
-| backend                 | when to use                               | cost/image |
-|-------------------------|-------------------------------------------|-----------:|
-| `ProductIdentity`       | fal.ai paid path (Flux Kontext / NB)      | $0.025-0.04|
-| `GeminiDirectIdentity`  | Google GenAI SDK direct (Nano Banana)     | $0.039     |
-| `MockIdentity`          | offline PIL demo for pipeline validation  | $0         |
+### What this buys us
 
-The lifestyle extension (see `EXTENSIONS.md`) adds a `CharacterIdentity`
-implementation. Composing product + character identity in one frame is a
-small additional module (`composite.py` in the extension plan), not a rewrite.
+| Old pattern | New pattern |
+|---|---|
+| Hardcoded `FRAME_MODELS` / `VIDEO_MODELS` dicts in `config.py` | One line per provider inside its vendor's module |
+| `if is_fal_frame_model(): ... elif cfg.video_model == "mock": ...` | `registry.build(model, kind=..., env=...)` |
+| Six files (`identity/product.py`, `identity/gemini_direct.py`, `identity/mock.py`, `video_gen.py`, `video_gen_gemini.py`, `video_gen_mock.py`) | Three files, one per vendor (`gemini.py`, `fal.py`, `mock.py`) |
+| `cfg.fal_key`, `cfg.gemini_api_key` typed fields | `env: dict[str, str]`, each provider declares its required keys |
+| Pricing lived in `config.py`, code lived in adapters — drift risk | Pricing sits next to the backend code, one source of truth |
+
+### Providers today
+
+**Frame** (4):
+
+| id | backend | $/image | env |
+|---|---|---:|---|
+| `gemini-2.5-flash-image` | `gemini-image` | $0.039 | GEMINI_API_KEY |
+| `fal-ai/flux-pro/kontext` | `fal-image` | $0.040 | FAL_KEY |
+| `fal-ai/gemini-25-flash-image` | `fal-image` | $0.025 | FAL_KEY |
+| `mock` | `mock-image` | $0.000 | — |
+
+**Video** (9):
+
+| id | backend | $/clip | env |
+|---|---|---:|---|
+| `veo-3.0-generate-001` (default) | `gemini-veo` | $4.50 | GEMINI_API_KEY |
+| `veo-3.1-generate-preview` | `gemini-veo` | $3.00 | GEMINI_API_KEY |
+| `veo-3.1-fast-generate-preview` | `gemini-veo` | $0.90 | GEMINI_API_KEY |
+| `veo-3.0-fast-generate-001` | `gemini-veo` | $0.90 | GEMINI_API_KEY |
+| `veo-3.1-lite-generate-preview` | `gemini-veo` | $1.20 | GEMINI_API_KEY |
+| `veo-2.0-generate-001` | `gemini-veo` | $0.50 | GEMINI_API_KEY |
+| `fal-ai/kling-video/v1.6/...` | `fal-video` | $0.30 | FAL_KEY |
+| `fal-ai/minimax/hailuo-02/...` | `fal-video` | $0.28 | FAL_KEY |
+| `mock` | `mock-video` | $0.000 | — |
+
+### Adding a new provider
+
+One file. Registered via side-effect import. See
+[`docs/EXTENSIONS.md`](EXTENSIONS.md#0-adding-a-new-provider-one-file-zero-dispatch-changes)
+for a worked Runway example.
+
+### Character identity (lifestyle extension)
+
+A `CharacterIdentity` implementation is the entire lifestyle extension — same
+`FrameBackend` Protocol as the product-identity backends, just keyed on a
+portrait reference. Composing product + character in one frame is a thin
+`CompositeFrameBackend` that delegates to two inner backends (product first,
+inpaint character second). None of the pipeline's orchestrators change.
 
 ## Why reference-conditioning and not just prompting
 

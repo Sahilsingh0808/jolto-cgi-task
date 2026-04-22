@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-04-22T15:19:07.347827Z",
+  "records": [
+    {
+      "stage": "brief",
+      "model": "gemini-2.5-flash",
+      "units": 1,
+      "unit_cost_usd": 0.01
+    },
+    {
+      "stage": "frame",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    },
+    {
+      "stage": "frame",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    },
+    {
+      "stage": "frame",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    },
+    {
+      "stage": "video",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    },
+    {
+      "stage": "video",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    },
+    {
+      "stage": "video",
+      "model": "mock",
+      "units": 1,
+      "unit_cost_usd": 0.0
+    }
+  ],
+  "total_usd": 0.01
+}

@@ -67,26 +67,52 @@ async def api_history() -> dict:
 
 @app.get("/api/config")
 async def config() -> dict:
-    """What the UI should offer as default model options."""
+    """What the UI should offer as model options.
 
-    from pipeline.config import FRAME_MODELS, VIDEO_MODELS, load_config
+    Sources everything from the provider registry — no hardcoded model
+    lists here, no hardcoded pricing. Adding a new provider picks up
+    through this endpoint automatically.
+    """
+
+    from pipeline.config import BRIEF_UNIT_COST_USD, load_config
+    from pipeline.providers import ProviderKind, registry
 
     cfg = load_config()
+
+    def _serialise(kind: ProviderKind) -> list[dict]:
+        return [
+            {
+                "id": p.id,
+                "display_name": p.display_name or p.id,
+                "unit_cost_usd": p.unit_cost_usd,
+                "unit": p.unit,
+                "tags": p.tags,
+                "requires_env": p.requires_env,
+                "env_ready": all(cfg.env.get(k) for k in p.requires_env),
+            }
+            for p in registry.list(kind)
+        ]
+
+    frame_providers = _serialise(ProviderKind.FRAME)
+    video_providers = _serialise(ProviderKind.VIDEO)
+
     return {
         "defaults": {
             "frame_model": cfg.frame_model,
             "video_model": cfg.video_model,
             "brief_model": cfg.brief_model,
         },
-        "frame_models": list(FRAME_MODELS.keys()),
-        "video_models": list(VIDEO_MODELS.keys()),
-        # Client-side cost estimate reads these. Values are estimates.
-        "frame_pricing": {k: v.unit_cost_usd for k, v in FRAME_MODELS.items()},
-        "video_pricing": {k: v.unit_cost_usd for k, v in VIDEO_MODELS.items()},
-        "brief_unit_cost_usd": cfg.brief_pricing.unit_cost_usd,
+        "frame_providers": frame_providers,
+        "video_providers": video_providers,
+        # Back-compat: some clients may read these flat lists.
+        "frame_models": [p["id"] for p in frame_providers],
+        "video_models": [p["id"] for p in video_providers],
+        "frame_pricing": {p["id"]: p["unit_cost_usd"] for p in frame_providers},
+        "video_pricing": {p["id"]: p["unit_cost_usd"] for p in video_providers},
+        "brief_unit_cost_usd": BRIEF_UNIT_COST_USD,
         "cost_ceiling_usd": cfg.cost_ceiling_usd,
-        "fal_configured": bool(cfg.fal_key),
-        "gemini_configured": bool(cfg.gemini_api_key),
+        "fal_configured": bool(cfg.env.get("FAL_KEY")),
+        "gemini_configured": bool(cfg.env.get("GEMINI_API_KEY")),
     }
 
 
@@ -97,7 +123,8 @@ async def api_suggest_inputs(product: UploadFile = File(...)) -> dict:
     from pipeline.config import load_config
 
     cfg = load_config()
-    if not cfg.gemini_api_key:
+    api_key = cfg.env.get("GEMINI_API_KEY")
+    if not api_key:
         raise HTTPException(400, "GEMINI_API_KEY not configured on the server")
 
     suffix = Path(product.filename or "").suffix.lower()
@@ -115,7 +142,7 @@ async def api_suggest_inputs(product: UploadFile = File(...)) -> dict:
     # The Gemini SDK is synchronous; run on a thread so we don't block the loop.
     try:
         result = await asyncio.to_thread(
-            suggest_inputs, image_bytes, mime, cfg.gemini_api_key
+            suggest_inputs, image_bytes, mime, api_key
         )
     except Exception as e:
         raise HTTPException(502, f"suggestion failed: {e}") from e

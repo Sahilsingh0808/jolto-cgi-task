@@ -1,13 +1,109 @@
-# Extensions: covering the other three video types
+# Extensions
 
-The CGI pipeline is a deliberate subset. This document says exactly what
-changes to reach the other three jewellery-ad types the assignment named —
-**lifestyle**, **short-form social**, and **occasion-led narrative** —
-and which of those changes are cheap vs. expensive.
+Two kinds of extension to document:
 
-The short version: most extensions are additional `IdentityModule`
-implementations plus small stage swaps. None require rewriting the
-`ShotGraph` abstraction or the six-stage pipeline.
+1. **Adding a model from a new provider** (Runway, Pika, Luma, any future
+   vendor). The fast, one-file change.
+2. **Covering the other three jewellery-ad types** — lifestyle, short-form
+   social, narrative. The deeper architectural extensions.
+
+---
+
+## 0. Adding a new provider (one file, zero dispatch changes)
+
+AI is a fast-moving industry. The pipeline is designed so that adding a new
+image or video model means writing one file and importing it — no edits to
+dispatch, config, or UI.
+
+### The contract
+
+Every provider is described by a `Provider` (pure data) and implemented
+by a `FrameBackend` or `VideoBackend` (Protocol). See
+[`pipeline/providers/registry.py`](../pipeline/providers/registry.py).
+
+```python
+class FrameBackend(Protocol):
+    model: str
+    def generate(self, request: FrameRequest) -> FrameResult: ...
+
+class VideoBackend(Protocol):
+    model: str
+    def generate(self, request: VideoRequest) -> VideoResult: ...
+```
+
+### Example: add Runway Gen-4 video
+
+Create `pipeline/providers/runway.py`:
+
+```python
+from .registry import Provider, ProviderKind, VideoRequest, VideoResult, registry
+import runway_sdk   # hypothetical
+
+
+class RunwayGen4Backend:
+    def __init__(self, provider: Provider, env: dict[str, str]):
+        self.provider = provider
+        self.model = provider.id
+        self._client = runway_sdk.Client(api_key=env["RUNWAY_API_KEY"])
+
+    def generate(self, request: VideoRequest) -> VideoResult:
+        # Translate our canonical VideoRequest into Runway's API,
+        # call it, download the MP4 to request.out_path.
+        ...
+        return VideoResult(clip_path=request.out_path, model=self.model)
+
+
+registry.register_backend(
+    "runway",
+    lambda provider, env: RunwayGen4Backend(provider, env),
+)
+
+for model_id, price in [
+    ("runway/gen-4-turbo",     0.50),
+    ("runway/gen-4-standard",  1.20),
+]:
+    registry.register_provider(Provider(
+        id=model_id,
+        kind=ProviderKind.VIDEO,
+        backend="runway",
+        unit="clip",
+        unit_cost_usd=price,
+        requires_env=["RUNWAY_API_KEY"],
+        display_name=f"Runway {model_id.split('/')[1]}",
+        tags=["runway"],
+    ))
+```
+
+Then add one line to `pipeline/providers/__init__.py`:
+
+```python
+from . import runway  # noqa: F401
+```
+
+**Done.** That's the entire change. Everything below picks up automatically:
+
+- UI dropdown populates via `GET /api/config` → `video_providers` list
+- Live cost estimate uses the declared `unit_cost_usd`
+- Dispatch in `pipeline/run.py` is `registry.build(cfg.video_model, kind=..., env=...)` — no string prefix checks, no if/elif
+- Missing `RUNWAY_API_KEY` fails fast with a clear error: *"provider 'runway/gen-4-turbo' requires env var(s): ['RUNWAY_API_KEY']"*
+- `/api/config` reports `"env_ready": false` when `RUNWAY_API_KEY` isn't set, so the UI can grey out the option
+
+### What *not* to touch when adding a provider
+
+None of the following need edits:
+
+- [`pipeline/run.py`](../pipeline/run.py) — dispatch is data-driven
+- [`pipeline/config.py`](../pipeline/config.py) — no hardcoded model lists
+- [`pipeline/frame_gen.py`](../pipeline/frame_gen.py) / [`video_gen.py`](../pipeline/video_gen.py) — they take a `Backend` protocol
+- [`server/main.py`](../server/main.py) — `/api/config` reads the registry
+- [`server/web/app.js`](../server/web/app.js) — dropdowns consume the API response
+
+### Adding a brand-new *kind* (e.g. audio/music)
+
+Rarer. Add a new `ProviderKind` enum value, a new `Backend` Protocol +
+`Request`/`Result` types in `registry.py`, a new orchestrator module (like
+`frame_gen.py` or `video_gen.py`), and wire it into the run orchestrator.
+Three files instead of one, but the pattern stays the same.
 
 ---
 
