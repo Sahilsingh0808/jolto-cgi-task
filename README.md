@@ -141,14 +141,16 @@ cp .env.example .env
 # fill in GEMINI_API_KEY / FAL_KEY / AUTH_USERNAME / AUTH_PASSWORD
 
 docker build -t jolto-pipeline:latest .
-docker run --rm -p 8000:8000 --env-file .env \
+docker run --rm -p 9000:8000 --env-file .env \
   -v "$(pwd)/runs:/app/runs" \
   jolto-pipeline:latest
 ```
 
-Open http://localhost:8000 and the browser will prompt for the credentials
-you set in `.env`. `runs/` is volume-mounted so every generation persists
-across container restarts and shows up in the History page.
+Open http://localhost:9000 and the browser will prompt for the credentials
+you set in `.env`. The host port is configurable — use `-p 9123:8000` or
+any other free port. The `runs/` directory is volume-mounted so every
+generation persists across container restarts and shows up in the History
+page.
 
 ### docker-compose (recommended)
 
@@ -162,7 +164,13 @@ docker compose logs -f jolto
 
 `docker-compose.yml` forces `HOST=0.0.0.0` and `PORT=8000` inside the
 container regardless of what's in `.env`, but honours `HOST_PORT` for the
-host-side mapping so you can run multiple instances on one machine.
+host-side mapping (default **9000**) so you can run multiple instances on
+one machine or pick any free port. To run on, say, 9123:
+
+```bash
+HOST_PORT=9123 docker compose up -d
+# or set HOST_PORT=9123 in .env
+```
 
 ### Auth
 

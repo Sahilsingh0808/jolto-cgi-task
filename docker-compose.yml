@@ -5,7 +5,9 @@ services:
     container_name: jolto
     restart: unless-stopped
     ports:
-      - "${HOST_PORT:-8000}:8000"
+      # Host-side port defaults to 9000 (8000-8032 are typically busy on
+      # shared deployment hosts). Override with HOST_PORT in .env.
+      - "${HOST_PORT:-9000}:8000"
     env_file:
       - .env
     environment:
