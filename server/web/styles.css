@@ -945,6 +945,41 @@ textarea::placeholder {
 
 /* ─────────────────────────────────────────────── history ─── */
 
+.history-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.history-filter .segmented-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+}
+
+.segmented-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 100px;
+  background: var(--line);
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  line-height: 1;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.segmented-option.is-selected .segmented-count {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--bg);
+}
+
 .history-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

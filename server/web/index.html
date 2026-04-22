@@ -288,13 +288,42 @@
             </p>
           </div>
 
+          <div class="history-toolbar">
+            <div
+              class="segmented-controls history-filter"
+              role="tablist"
+              aria-label="Filter past runs"
+            >
+              <button
+                type="button"
+                class="segmented-option is-selected"
+                data-filter="completed"
+                role="tab"
+                aria-selected="true"
+              >
+                <span>Completed</span>
+                <span class="segmented-count" data-count-for="completed">0</span>
+              </button>
+              <button
+                type="button"
+                class="segmented-option"
+                data-filter="all"
+                role="tab"
+                aria-selected="false"
+              >
+                <span>All</span>
+                <span class="segmented-count" data-count-for="all">0</span>
+              </button>
+            </div>
+          </div>
+
           <div id="history-grid" class="history-grid" aria-live="polite">
             <div class="history-loading">loading…</div>
           </div>
 
           <div id="history-empty" class="history-empty" hidden>
             <i data-lucide="archive"></i>
-            <span>No past runs yet. Make one from the home page.</span>
+            <span id="history-empty-label">No past runs yet. Make one from the home page.</span>
           </div>
         </section>
 

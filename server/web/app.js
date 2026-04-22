@@ -15,6 +15,8 @@
     runId: null,
     eventSource: null,
     currentStage: null,
+    historyRuns: [],
+    historyFilter: "completed",
   };
 
   const STAGE_ORDER = ["brief", "plan", "frames", "video", "stitch"];
@@ -586,26 +588,63 @@ Deliverable: three or four shots with slow crossfades.`;
 
   async function loadHistory() {
     const grid = $("#history-grid");
-    const empty = $("#history-empty");
     try {
       const res = await fetch("/api/history");
       const data = await res.json();
-      const runs = data.runs || [];
-
-      if (runs.length === 0) {
-        grid.innerHTML = "";
-        empty.hidden = false;
-        render();
-        return;
-      }
-
-      empty.hidden = true;
-      grid.innerHTML = "";
-      runs.forEach((r) => grid.appendChild(renderHistoryCard(r)));
-      render();
+      state.historyRuns = data.runs || [];
     } catch (err) {
       grid.innerHTML = `<div class="history-loading">failed to load history</div>`;
+      return;
     }
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const grid = $("#history-grid");
+    const empty = $("#history-empty");
+    const emptyLabel = $("#history-empty-label");
+    const runs = state.historyRuns;
+
+    const completed = runs.filter((r) => r.status === "succeeded");
+    $('[data-count-for="completed"]').textContent = completed.length;
+    $('[data-count-for="all"]').textContent = runs.length;
+
+    const visible =
+      state.historyFilter === "completed" ? completed : runs;
+
+    if (visible.length === 0) {
+      grid.innerHTML = "";
+      empty.hidden = false;
+      if (runs.length === 0) {
+        emptyLabel.textContent = "No past runs yet. Make one from the home page.";
+      } else {
+        emptyLabel.textContent =
+          "No completed runs yet. Switch to \u201cAll\u201d to see partials and plans.";
+      }
+      render();
+      return;
+    }
+
+    empty.hidden = true;
+    grid.innerHTML = "";
+    visible.forEach((r) => grid.appendChild(renderHistoryCard(r)));
+    render();
+  }
+
+  function setupHistoryFilter() {
+    $$(".history-filter .segmented-option").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.filter;
+        if (value === state.historyFilter) return;
+        state.historyFilter = value;
+        $$(".history-filter .segmented-option").forEach((other) => {
+          const selected = other === btn;
+          other.classList.toggle("is-selected", selected);
+          other.setAttribute("aria-selected", selected ? "true" : "false");
+        });
+        renderHistory();
+      });
+    });
   }
 
   function renderHistoryCard(r) {
@@ -688,6 +727,7 @@ Deliverable: three or four shots with slow crossfades.`;
     render();
     setupDropzone();
     setupSegmented();
+    setupHistoryFilter();
     setupForm();
     loadConfig();
     route();
