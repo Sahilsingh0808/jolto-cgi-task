@@ -17,6 +17,7 @@
     currentStage: null,
     historyRuns: [],
     historyFilter: "completed",
+    hasSuggested: false,
   };
 
   const STAGE_ORDER = ["brief", "plan", "frames", "video", "stitch"];
@@ -131,6 +132,9 @@ Deliverable: three or four shots with slow crossfades.`;
         empty.hidden = true;
       };
       reader.readAsDataURL(file);
+      state.hasSuggested = false;
+      resetSuggestLabel();
+      setSuggestEnabled(true);
     }
 
     input.addEventListener("change", (e) => {
@@ -143,6 +147,9 @@ Deliverable: three or four shots with slow crossfades.`;
       input.value = "";
       preview.hidden = true;
       empty.hidden = false;
+      setSuggestEnabled(false);
+      state.hasSuggested = false;
+      resetSuggestLabel();
     });
 
     ["dragenter", "dragover"].forEach((ev) =>
@@ -189,6 +196,80 @@ Deliverable: three or four shots with slow crossfades.`;
       });
       select(hidden.value || defaultValue);
     });
+  }
+
+  // ─────────────────────────────────────────── AI auto-fill
+
+  function setSuggestEnabled(enabled) {
+    const btn = $("#suggest-btn");
+    const row = btn.closest(".suggest-row");
+    btn.disabled = !enabled;
+    row.classList.toggle("is-ready", enabled);
+    $("#suggest-hint").textContent = enabled
+      ? state.hasSuggested
+        ? "tap shuffle for another take"
+        : "Gemini will describe the piece"
+      : "upload an image first";
+  }
+
+  function resetSuggestLabel() {
+    $("#suggest-label").textContent = "Auto-fill from image";
+    $("#suggest-icon").setAttribute("data-lucide", "wand-2");
+    render();
+  }
+
+  function applySuggestedToLabelShuffle() {
+    $("#suggest-label").textContent = "Shuffle";
+    $("#suggest-icon").setAttribute("data-lucide", "shuffle");
+    render();
+  }
+
+  async function runSuggest() {
+    const input = $("#product-file");
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const btn = $("#suggest-btn");
+    const labelEl = $("#suggest-label");
+    const hintEl = $("#suggest-hint");
+    const originalLabel = labelEl.textContent;
+
+    btn.disabled = true;
+    btn.classList.add("is-loading");
+    labelEl.textContent = state.hasSuggested ? "Shuffling…" : "Reading image…";
+    hintEl.textContent = "calling Gemini";
+
+    try {
+      const fd = new FormData();
+      fd.append("product", file);
+      const res = await fetch("/api/suggest-inputs", { method: "POST", body: fd });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `status ${res.status}`);
+      }
+      const data = await res.json();
+      $("#product-name").value = data.product_name || "";
+      $("#product-material").value = data.product_material || "";
+      $("#product-notes").value = data.product_notes || "";
+      $("#brief").value = data.brief || "";
+
+      state.hasSuggested = true;
+      applySuggestedToLabelShuffle();
+      hintEl.textContent = "tap shuffle for another take";
+    } catch (err) {
+      labelEl.textContent = originalLabel;
+      hintEl.textContent = "suggestion failed — try again";
+      console.error("suggest failed:", err);
+    } finally {
+      btn.classList.remove("is-loading");
+      btn.disabled = false;
+    }
+  }
+
+  function setupSuggest() {
+    const btn = $("#suggest-btn");
+    if (!btn) return;
+    btn.addEventListener("click", runSuggest);
   }
 
   function setupForm() {
@@ -741,6 +822,7 @@ Deliverable: three or four shots with slow crossfades.`;
     setupDropzone();
     setupSegmented();
     setupHistoryFilter();
+    setupSuggest();
     setupForm();
     loadConfig();
     route();

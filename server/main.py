@@ -26,6 +26,7 @@ from .auth import install_basic_auth
 from .history import list_past_runs, rehydrate_run
 from .pipeline_runner import launch_run
 from .state import Run, RunStatus, registry
+from .suggest import suggest_inputs
 
 APP_ROOT = Path(__file__).resolve().parent
 WEB_ROOT = APP_ROOT / "web"
@@ -82,6 +83,39 @@ async def config() -> dict:
         "fal_configured": bool(cfg.fal_key),
         "gemini_configured": bool(cfg.gemini_api_key),
     }
+
+
+@app.post("/api/suggest-inputs")
+async def api_suggest_inputs(product: UploadFile = File(...)) -> dict:
+    """Use Gemini vision to propose form inputs from the uploaded image."""
+
+    from pipeline.config import load_config
+
+    cfg = load_config()
+    if not cfg.gemini_api_key:
+        raise HTTPException(400, "GEMINI_API_KEY not configured on the server")
+
+    suffix = Path(product.filename or "").suffix.lower()
+    mime = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+    }.get(suffix, "image/jpeg")
+
+    image_bytes = await product.read()
+    if not image_bytes:
+        raise HTTPException(400, "empty product image")
+
+    # The Gemini SDK is synchronous; run on a thread so we don't block the loop.
+    try:
+        result = await asyncio.to_thread(
+            suggest_inputs, image_bytes, mime, cfg.gemini_api_key
+        )
+    except Exception as e:
+        raise HTTPException(502, f"suggestion failed: {e}") from e
+
+    return result.model_dump()
 
 
 @app.post("/api/runs")

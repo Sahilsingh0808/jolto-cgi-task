@@ -458,6 +458,75 @@ textarea::placeholder {
   box-shadow: var(--shadow-sm);
 }
 
+/* suggest (AI auto-fill) row */
+.suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 150ms var(--ease), background 150ms var(--ease),
+    color 150ms var(--ease), transform 150ms var(--ease);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.suggest-btn:not(:disabled):hover {
+  border-color: var(--ink);
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+.suggest-btn:disabled {
+  color: var(--ink-4);
+  background: var(--surface-2);
+  cursor: not-allowed;
+}
+
+.suggest-btn.is-loading {
+  color: var(--ink-3);
+  cursor: progress;
+}
+
+.suggest-btn.is-loading #suggest-icon {
+  animation: spin 0.9s linear infinite;
+}
+
+.suggest-btn [data-lucide] {
+  width: 15px;
+  height: 15px;
+}
+
+.suggest-hint {
+  font-size: 12px;
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+}
+
+.suggest-row.is-ready .suggest-hint {
+  color: var(--ink-3);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* backends accordion */
 .backends {
   padding: 20px 0;
