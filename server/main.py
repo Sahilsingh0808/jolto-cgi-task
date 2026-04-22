@@ -196,7 +196,7 @@ async def get_artifact(run_id: str, kind: str, name: str) -> FileResponse:
     run = _find_run(run_id)
     if run is None or run.run_dir is None:
         raise HTTPException(404, "run not found")
-    if kind not in {"keyframes", "clips", "final", "graph", "cost"}:
+    if kind not in {"keyframes", "clips", "final", "graph", "cost", "logs"}:
         raise HTTPException(400, "unknown artifact kind")
     if kind == "keyframes":
         path = run.run_dir / "keyframes" / name
@@ -206,6 +206,8 @@ async def get_artifact(run_id: str, kind: str, name: str) -> FileResponse:
         path = run.run_dir / "final.mp4"
     elif kind == "graph":
         path = run.run_dir / "shot_graph.json"
+    elif kind == "logs":
+        path = run.run_dir / "logs.txt"
     else:
         path = run.run_dir / "cost_log.json"
     if not path.exists():

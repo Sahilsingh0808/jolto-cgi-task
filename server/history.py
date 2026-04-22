@@ -142,7 +142,18 @@ def rehydrate_run(run_id: str, root: Path = RUNS_ROOT) -> Optional[Run]:
     )
     run.keyframes = _extant_keyframes(run_dir / "keyframes", shots)
     run.clips = _extant_clips(run_dir / "clips", shots)
+    run.logs = _read_logs(run_dir / "logs.txt")
     return run
+
+
+def _read_logs(path: Path, tail: int = 400) -> list[str]:
+    if not path.exists():
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    return lines[-tail:]
 
 
 def _extant_keyframes(keyframes_dir: Path, shots: list[dict]) -> list[str]:

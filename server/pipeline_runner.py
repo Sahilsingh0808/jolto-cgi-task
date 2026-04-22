@@ -57,6 +57,7 @@ async def launch_run(
 
     run.run_dir = RUNS_ROOT / run.id
     run.run_dir.mkdir(parents=True, exist_ok=True)
+    log_file = (run.run_dir / "logs.txt").open("w", buffering=1, encoding="utf-8")
     run.status = RunStatus.RUNNING
     await run.emit({"type": "status", "status": run.status.value})
 
@@ -95,8 +96,10 @@ async def launch_run(
     env["JOLTO_FRAME_MODEL"] = frame_model
     env["JOLTO_VIDEO_MODEL"] = video_model
 
-    run.logs.append(f"$ {' '.join(shlex.quote(c) for c in cmd)}")
-    await run.emit({"type": "log", "line": run.logs[-1]})
+    cmd_line = f"$ {' '.join(shlex.quote(c) for c in cmd)}"
+    run.logs.append(cmd_line)
+    log_file.write(cmd_line + "\n")
+    await run.emit({"type": "log", "line": cmd_line})
 
     proc = await asyncio.create_subprocess_exec(
         *cmd,
@@ -115,14 +118,20 @@ async def launch_run(
             line = _clean(raw.decode(errors="replace"))
             if not line:
                 continue
+            log_file.write(line + "\n")
             await _handle_line(run, line)
         rc = await proc.wait()
     except Exception as e:
         run.error = f"runner crashed: {e}"
         run.status = RunStatus.FAILED
+        log_file.write(f"\n[runner] {run.error}\n")
+        log_file.close()
         await run.emit({"type": "error", "message": run.error})
         await run.emit({"type": "status", "status": run.status.value})
         return
+    finally:
+        if not log_file.closed:
+            log_file.flush()
 
     if rc != 0:
         run.status = RunStatus.FAILED
@@ -141,6 +150,7 @@ async def launch_run(
             run.total_cost_usd = cost
             await run.emit({"type": "cost_update", "total_usd": cost})
 
+    log_file.close()
     await run.emit({"type": "status", "status": run.status.value})
 
 

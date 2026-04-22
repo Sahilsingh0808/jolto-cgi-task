@@ -465,7 +465,7 @@ Deliverable: three or four shots with slow crossfades.`;
       resultTitle.textContent = "Partial run.";
       resultSub.textContent =
         "Video stage did not finish. The shot graph and keyframes below are intact.";
-      $("#result-error").hidden = true;
+      fillErrorDetail(snapshot);
       $("#download-video").style.display = "none";
     } else {
       video.removeAttribute("src");
@@ -474,13 +474,26 @@ Deliverable: three or four shots with slow crossfades.`;
       resultEyebrow.classList.add("run-failed");
       resultTitle.textContent = "Run failed.";
       resultSub.textContent =
-        "Nothing generated. See the log panel for the error, or check the backends configuration.";
-      $("#result-error").hidden = false;
+        "The pipeline did not produce any output. Log tail below.";
+      fillErrorDetail(snapshot);
       $("#download-video").style.display = "none";
     }
 
     loadShotGraph(runId);
     render();
+  }
+
+  function fillErrorDetail(snapshot) {
+    const card = $("#result-error");
+    const detail = $("#error-detail");
+    if (!snapshot) {
+      card.hidden = true;
+      return;
+    }
+    const lines = (snapshot.logs || []).slice(-50);
+    const header = snapshot.error ? snapshot.error + "\n\n— last log lines —\n\n" : "";
+    detail.textContent = header + lines.join("\n");
+    card.hidden = lines.length === 0 && !snapshot.error;
   }
 
   async function loadShotGraph(runId) {

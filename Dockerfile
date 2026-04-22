@@ -22,12 +22,13 @@ COPY server ./server
 RUN python -m venv /venv \
  && /venv/bin/pip install --upgrade pip setuptools wheel
 
-# Install CPU-only torch first from the official PyTorch index, otherwise
-# pip pulls 2+ GB of unused CUDA libraries on aarch64. The subsequent
-# `pip install .` sees torch already satisfied and skips the CUDA-bundled
-# wheel.
+# Install CPU-only torch AND torchvision from the official PyTorch index.
+# Both must come from the same index so their native extensions link
+# correctly (otherwise `torchvision::nms` fails to register on import).
+# Doing this first means the subsequent `pip install .` sees them already
+# satisfied and skips the PyPI CUDA-bundled wheels.
 RUN /venv/bin/pip install --index-url https://download.pytorch.org/whl/cpu \
-      torch
+      torch torchvision
 
 RUN /venv/bin/pip install .
 
