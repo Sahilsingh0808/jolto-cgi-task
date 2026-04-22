@@ -76,9 +76,14 @@ async def config() -> dict:
         "defaults": {
             "frame_model": cfg.frame_model,
             "video_model": cfg.video_model,
+            "brief_model": cfg.brief_model,
         },
         "frame_models": list(FRAME_MODELS.keys()),
         "video_models": list(VIDEO_MODELS.keys()),
+        # Client-side cost estimate reads these. Values are estimates.
+        "frame_pricing": {k: v.unit_cost_usd for k, v in FRAME_MODELS.items()},
+        "video_pricing": {k: v.unit_cost_usd for k, v in VIDEO_MODELS.items()},
+        "brief_unit_cost_usd": cfg.brief_pricing.unit_cost_usd,
         "cost_ceiling_usd": cfg.cost_ceiling_usd,
         "fal_configured": bool(cfg.fal_key),
         "gemini_configured": bool(cfg.gemini_api_key),

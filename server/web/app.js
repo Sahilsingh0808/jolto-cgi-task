@@ -18,6 +18,9 @@
     historyRuns: [],
     historyFilter: "completed",
     hasSuggested: false,
+    framePricing: {},
+    videoPricing: {},
+    briefPricing: 0.01,
   };
 
   const STAGE_ORDER = ["brief", "plan", "frames", "video", "stitch"];
@@ -55,6 +58,10 @@ Deliverable: three or four shots with slow crossfades.`;
       const res = await fetch("/api/config");
       const data = await res.json();
 
+      state.framePricing = data.frame_pricing || {};
+      state.videoPricing = data.video_pricing || {};
+      state.briefPricing = data.brief_unit_cost_usd ?? 0.01;
+
       const frameSel = $("#frame-model");
       const videoSel = $("#video-model");
       frameSel.innerHTML = "";
@@ -62,14 +69,14 @@ Deliverable: three or four shots with slow crossfades.`;
       data.frame_models.forEach((m) => {
         const opt = document.createElement("option");
         opt.value = m;
-        opt.textContent = m === "mock" ? "mock (no API calls, free)" : m;
+        opt.textContent = labelForModel(m, state.framePricing[m]);
         if (m === data.defaults.frame_model) opt.selected = true;
         frameSel.appendChild(opt);
       });
       data.video_models.forEach((m) => {
         const opt = document.createElement("option");
         opt.value = m;
-        opt.textContent = m === "mock" ? "mock (no API calls, free)" : m;
+        opt.textContent = labelForModel(m, state.videoPricing[m]);
         if (m === data.defaults.video_model) opt.selected = true;
         videoSel.appendChild(opt);
       });
@@ -90,28 +97,32 @@ Deliverable: three or four shots with slow crossfades.`;
     }
   }
 
+  function labelForModel(name, price) {
+    if (name === "mock") return "mock (no API calls, free)";
+    if (price == null) return name;
+    if (price === 0) return `${name} (free)`;
+    return `${name} (~$${price.toFixed(2)})`;
+  }
+
   function updateCostEstimate() {
     const fm = $("#frame-model").value;
     const vm = $("#video-model").value;
     const duration = parseInt($("#opt-duration").value, 10) || 15;
     const est = $("#cost-estimate");
 
-    // A shot is ~4-6s on Veo. Duration/5 rounded gives a usable estimate.
+    // A shot is ~4-6s on Veo. Duration/5 rounded gives a usable shot count.
     const shots = Math.max(2, Math.round(duration / 5));
 
-    if (fm === "mock" && vm === "mock") {
-      est.textContent = "$0.01 per run · mock backends";
-      return;
-    }
-    if (fm.includes("mock") || vm.includes("mock")) {
-      est.textContent = `~$${(0.9 * shots).toFixed(2)} per run · partial mock`;
-      return;
-    }
+    const framePrice = state.framePricing[fm] ?? 0;
+    const videoPrice = state.videoPricing[vm] ?? 0;
+    const total = state.briefPricing + framePrice * shots + videoPrice * shots;
 
-    const framePerImage = fm.includes("flux") ? 0.04 : 0.039;
-    const videoPerClip = vm.includes("kling") ? 0.3 : vm.includes("hailuo") ? 0.28 : 0.9;
-    const total = 0.01 + framePerImage * shots + videoPerClip * shots;
-    est.textContent = `~$${total.toFixed(2)} per run · ${shots} shots · ${duration}s`;
+    if (fm === "mock" && vm === "mock") {
+      est.textContent = `$${state.briefPricing.toFixed(2)} per run · mock backends`;
+      return;
+    }
+    const partial = fm === "mock" || vm === "mock" ? " · partial mock" : "";
+    est.textContent = `~$${total.toFixed(2)} per run · ${shots} shots · ${duration}s${partial}`;
   }
 
   // ─────────────────────────────────────────── input binding

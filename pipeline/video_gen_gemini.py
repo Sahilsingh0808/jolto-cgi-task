@@ -19,7 +19,7 @@ from .schema import ShotGraph
 
 console = Console()
 
-DEFAULT_MODEL = "veo-3.1-fast-generate-preview"
+DEFAULT_MODEL = "veo-3.0-generate-001"
 
 
 def generate_clips_gemini(

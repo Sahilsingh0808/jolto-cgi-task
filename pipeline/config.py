@@ -40,13 +40,23 @@ VIDEO_MODELS: dict[str, ModelPricing] = {
     "fal-ai/minimax/hailuo-02/standard/image-to-video": ModelPricing(
         "fal-ai/minimax/hailuo-02/standard/image-to-video", 0.28, "clip"
     ),
-    # Direct Gemini Veo. Priced per-second; we quote a ~6s clip estimate.
+    # Direct Gemini Veo. Priced per-second; values below assume a ~6s clip.
+    # Source: ai.google.dev/pricing at time of writing — treat as estimates.
+    # Standard (full quality, non-fast)
+    "veo-3.0-generate-001": ModelPricing("veo-3.0-generate-001", 4.50, "clip"),
+    "veo-3.1-generate-preview": ModelPricing("veo-3.1-generate-preview", 3.00, "clip"),
+    # Fast (approx 2x cheaper than standard)
     "veo-3.1-fast-generate-preview": ModelPricing(
         "veo-3.1-fast-generate-preview", 0.90, "clip"
     ),
     "veo-3.0-fast-generate-001": ModelPricing(
         "veo-3.0-fast-generate-001", 0.90, "clip"
     ),
+    # Lite (cheapest 3.x tier)
+    "veo-3.1-lite-generate-preview": ModelPricing(
+        "veo-3.1-lite-generate-preview", 1.20, "clip"
+    ),
+    # Legacy
     "veo-2.0-generate-001": ModelPricing("veo-2.0-generate-001", 0.50, "clip"),
     # Offline ken-burns mock via ffmpeg. No cost.
     "mock": ModelPricing("mock", 0.0, "clip"),
@@ -90,7 +100,7 @@ class Config:
 
 def load_config() -> Config:
     frame_model = os.getenv("JOLTO_FRAME_MODEL", "gemini-2.5-flash-image")
-    video_model = os.getenv("JOLTO_VIDEO_MODEL", "veo-3.1-fast-generate-preview")
+    video_model = os.getenv("JOLTO_VIDEO_MODEL", "veo-3.0-generate-001")
     brief_model = os.getenv("JOLTO_BRIEF_MODEL", "gemini-2.5-flash")
 
     if frame_model not in FRAME_MODELS:
@@ -104,7 +114,7 @@ def load_config() -> Config:
         frame_model=frame_model,
         video_model=video_model,
         brief_model=brief_model,
-        cost_ceiling_usd=float(os.getenv("JOLTO_COST_CEILING_USD", "15.0")),
+        cost_ceiling_usd=float(os.getenv("JOLTO_COST_CEILING_USD", "25.0")),
         output_root=Path(os.getenv("JOLTO_OUTPUT_ROOT", "runs")).expanduser(),
         fal_key=os.getenv("FAL_KEY"),
         gemini_api_key=os.getenv("GEMINI_API_KEY"),
