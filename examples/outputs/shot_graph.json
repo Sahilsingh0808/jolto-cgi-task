@@ -1,0 +1,63 @@
+{
+  "concept": "Still Light: an intimate exploration of the exquisite craftsmanship and luxurious glow of the gold bead drop earrings, designed for a quiet, patient, and expensive tone.",
+  "product": {
+    "image_path": "/private/var/folders/1x/qnnygnts6md4zr773y_db5xc0000gn/T/jolto-0f2b4d507d4f-2cxi7n1o/product.jpg",
+    "name": "gold bead drop earrings",
+    "material": "22k yellow gold with clustered bead construction and dangling charms",
+    "notes": "pair of earrings, warm gold finish, intricate bead pattern"
+  },
+  "style": {
+    "palette": "Rich golds, deep ebony, subtle warm amber glows.",
+    "lighting": "Single, warm, low-angle key light creating dramatic shadows and highlighting bead textures. Controlled rim light for edge definition. Specular highlights across gold.",
+    "mood": "Serene, luxurious, intimate, sculptural.",
+    "environment": "Minimalist, abstract, dark, featuring polished obsidian surfaces and deep ebony velvet textures.",
+    "grade": "Rich, cinematic, slightly desaturated except for vibrant gold, with deep contrast."
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "order": 1,
+      "duration_s": 5.0,
+      "framing": "extreme_close_up",
+      "camera": "dolly_in",
+      "intent": "To draw the viewer into the exquisite detail and texture of the clustered gold beads.",
+      "scene_description": "A single gold bead drop earring, angled slightly, with the camera slowly pushing into the dense, clustered beadwork at its top, revealing the individual spheres and their warm, matte-satin finish. Soft, warm light skims the surface, creating subtle specular highlights. The background is an indistinct, deep, dark void.",
+      "frame_prompt": "extreme macro close-up of the gold bead drop earrings, 22k yellow gold with clustered bead construction and dangling charms. A single gold bead drop earring, angled slightly, with the camera slowly pushing into the dense, clustered beadwork at its top, revealing the individual spheres and their warm, matte-satin finish. Soft, warm light skims the surface, creating subtle specular highlights. The background is an indistinct, deep, dark void. Environment: Minimalist, abstract, dark, featuring polished obsidian surfaces and deep ebony velvet textures.. Lighting: Single, warm, low-angle key light creating dramatic shadows and highlighting bead textures. Controlled rim light for edge definition. Specular highlights across gold.. Palette: Rich golds, deep ebony, subtle warm amber glows.. Mood: Serene, luxurious, intimate, sculptural.. Grade: Rich, cinematic, slightly desaturated except for vibrant gold, with deep contrast.. Composition hint: wider composition with negative space, product centred. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow cinematic dolly-in toward the product; the frame tightens continuously. The product (gold bead drop earrings) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/keyframes/s01.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/clips/s01.mp4",
+      "qa_score": 0.7438459396362305,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s02",
+      "order": 2,
+      "duration_s": 5.0,
+      "framing": "close_up",
+      "camera": "orbit_right",
+      "intent": "To showcase the complete form of the earring, emphasizing its elegant drop and the interplay of light on the dangling charms.",
+      "scene_description": "The same earring, now slightly further back, rotating slowly as the camera orbits right. The dangling cluster of smaller gold beads sways subtly, catching the warm, directional light, creating glints and soft reflections on a polished, dark obsidian surface.",
+      "frame_prompt": "close-up product shot of the gold bead drop earrings, 22k yellow gold with clustered bead construction and dangling charms. The same earring, now slightly further back, rotating slowly as the camera orbits right. The dangling cluster of smaller gold beads sways subtly, catching the warm, directional light, creating glints and soft reflections on a polished, dark obsidian surface. Environment: Minimalist, abstract, dark, featuring polished obsidian surfaces and deep ebony velvet textures.. Lighting: Single, warm, low-angle key light creating dramatic shadows and highlighting bead textures. Controlled rim light for edge definition. Specular highlights across gold.. Palette: Rich golds, deep ebony, subtle warm amber glows.. Mood: Serene, luxurious, intimate, sculptural.. Grade: Rich, cinematic, slightly desaturated except for vibrant gold, with deep contrast.. Composition hint: three-quarter view from the left, prepared for a rightward orbit. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow smooth arc of the camera orbiting to the right around the product. The product (gold bead drop earrings) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/keyframes/s02.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/clips/s02.mp4",
+      "qa_score": 0.749408483505249,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s03",
+      "order": 3,
+      "duration_s": 5.0,
+      "framing": "medium",
+      "camera": "reveal",
+      "intent": "To conclude with a powerful image of the elegant pair, highlighting their harmonious design and luxurious presence.",
+      "scene_description": "Both gold bead drop earrings emerge into view, perfectly mirrored, as if rising from behind a fold of deep ebony velvet. They are positioned slightly apart, their warm gold gleaming under a soft, controlled overhead light that creates a subtle halo effect. The intricate beadwork and dangling elements are clearly visible, framed against the rich, dark texture.",
+      "frame_prompt": "medium product shot with environment of the gold bead drop earrings, 22k yellow gold with clustered bead construction and dangling charms. Both gold bead drop earrings emerge into view, perfectly mirrored, as if rising from behind a fold of deep ebony velvet. They are positioned slightly apart, their warm gold gleaming under a soft, controlled overhead light that creates a subtle halo effect. The intricate beadwork and dangling elements are clearly visible, framed against the rich, dark texture. Environment: Minimalist, abstract, dark, featuring polished obsidian surfaces and deep ebony velvet textures.. Lighting: Single, warm, low-angle key light creating dramatic shadows and highlighting bead textures. Controlled rim light for edge definition. Specular highlights across gold.. Palette: Rich golds, deep ebony, subtle warm amber glows.. Mood: Serene, luxurious, intimate, sculptural.. Grade: Rich, cinematic, slightly desaturated except for vibrant gold, with deep contrast.. Composition hint: foreground element partially occluding the product. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "foreground element clears to reveal the product in full. The product (gold bead drop earrings) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/keyframes/s03.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/0f2b4d507d4f/clips/s03.mp4",
+      "qa_score": 0.7544006705284119,
+      "qa_attempts": 1
+    }
+  ]
+}

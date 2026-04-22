@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-04-22T00:18:45.972457Z",
+  "records": [
+    {
+      "stage": "brief",
+      "model": "gemini-2.5-flash",
+      "units": 1,
+      "unit_cost_usd": 0.01
+    },
+    {
+      "stage": "frame",
+      "model": "gemini-2.5-flash-image",
+      "units": 1,
+      "unit_cost_usd": 0.039
+    },
+    {
+      "stage": "frame",
+      "model": "gemini-2.5-flash-image",
+      "units": 1,
+      "unit_cost_usd": 0.039
+    },
+    {
+      "stage": "frame",
+      "model": "gemini-2.5-flash-image",
+      "units": 1,
+      "unit_cost_usd": 0.039
+    },
+    {
+      "stage": "video",
+      "model": "veo-3.1-fast-generate-preview",
+      "units": 1,
+      "unit_cost_usd": 0.9
+    },
+    {
+      "stage": "video",
+      "model": "veo-3.1-fast-generate-preview",
+      "units": 1,
+      "unit_cost_usd": 0.9
+    },
+    {
+      "stage": "video",
+      "model": "veo-3.1-fast-generate-preview",
+      "units": 1,
+      "unit_cost_usd": 0.9
+    }
+  ],
+  "total_usd": 2.827
+}

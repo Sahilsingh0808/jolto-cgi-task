@@ -1,0 +1,63 @@
+{
+  "concept": "An intimate, archival exploration of the Heritage vine gold bangles, highlighting the intricate handwork, rich 22k gold, and the timeless elegance of traditional Indian craftsmanship under a single, warm light.",
+  "product": {
+    "image_path": "/private/var/folders/1x/qnnygnts6md4zr773y_db5xc0000gn/T/jolto-08c9908aee88-up176lfz/product.png",
+    "name": "Heritage vine gold bangles (pair)",
+    "material": "22k yellow gold bangle pair, hand-engraved vine and leaf motifs with applied granulation and milgrain borders",
+    "notes": "matched pair, heritage Indian goldwork, one bangle with filigree leaf-work, the other with engraved vine and granulation detail, rich warm gold finish, intended to be worn stacked"
+  },
+  "style": {
+    "palette": "deep obsidian black with warm amber highlights",
+    "lighting": "single soft rim light from upper-left, controlled specular on metal, clean shadow falloff",
+    "mood": "quiet, patient, expensive; the stillness of an empty gallery",
+    "environment": "abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes",
+    "grade": "high-contrast cinematic, subtle film grain, warm black point"
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "order": 1,
+      "duration_s": 5.0,
+      "framing": "extreme_close_up",
+      "camera": "dolly_in",
+      "intent": "To introduce the intricate hand-engraved details and granulation, emphasizing the artistry of the bangles.",
+      "scene_description": "An extreme close-up of the filigree leaf-work and granulated beads on one gold bangle, bathed in a low, warm tungsten light that slowly rolls across the highly textured surface, revealing its depth and craftsmanship against a deep brown, softly rippling satin background.",
+      "frame_prompt": "extreme macro close-up of the Heritage vine gold bangles (pair), 22k yellow gold bangle pair, hand-engraved vine and leaf motifs with applied granulation and milgrain borders. An extreme close-up of the filigree leaf-work and granulated beads on one gold bangle, bathed in a low, warm tungsten light that slowly rolls across the highly textured surface, revealing its depth and craftsmanship against a deep brown, softly rippling satin background. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, wider composition with negative space, product centred. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow cinematic dolly-in toward the product; the frame tightens continuously. The product (Heritage vine gold bangles (pair)) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/keyframes/s01.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/clips/s01.mp4",
+      "qa_score": 0.929485023021698,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s02",
+      "order": 2,
+      "duration_s": 5.0,
+      "framing": "close_up",
+      "camera": "orbit_right",
+      "intent": "To showcase both bangles as a matching pair, highlighting their unique textures and the rich luster of the gold as light plays across their surfaces.",
+      "scene_description": "The two 22k gold bangles are stacked elegantly on a dark, rich brown satin surface. A single warm key light from the left casts gentle shadows and highlights, emphasizing the milgrain borders and engraved vine motifs as the scene slowly rotates.",
+      "frame_prompt": "close-up product shot of the Heritage vine gold bangles (pair), 22k yellow gold bangle pair, hand-engraved vine and leaf motifs with applied granulation and milgrain borders. The two 22k gold bangles are stacked elegantly on a dark, rich brown satin surface. A single warm key light from the left casts gentle shadows and highlights, emphasizing the milgrain borders and engraved vine motifs as the scene slowly rotates. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, three-quarter view from the left, prepared for a rightward orbit. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow smooth arc of the camera orbiting to the right around the product. The product (Heritage vine gold bangles (pair)) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/keyframes/s02.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/clips/s02.mp4",
+      "qa_score": 0.9156767725944519,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s03",
+      "order": 3,
+      "duration_s": 5.0,
+      "framing": "medium",
+      "camera": "dolly_out",
+      "intent": "To provide a wider, yet still intimate, view of the complete bangle pair, establishing their presence and the luxurious, heritage setting.",
+      "scene_description": "The stacked pair of heritage gold bangles rests prominently on a rumpled dark brown satin, with subtle folds in the fabric visible. Tiny, almost imperceptible dust motes drift gently in the warm, low light, creating an atmosphere of quiet tradition and timeless beauty.",
+      "frame_prompt": "medium product shot with environment of the Heritage vine gold bangles (pair), 22k yellow gold bangle pair, hand-engraved vine and leaf motifs with applied granulation and milgrain borders. The stacked pair of heritage gold bangles rests prominently on a rumpled dark brown satin, with subtle folds in the fabric visible. Tiny, almost imperceptible dust motes drift gently in the warm, low light, creating an atmosphere of quiet tradition and timeless beauty. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, tight product framing, room for the camera to pull back. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow cinematic dolly-out pulling away from the product. The product (Heritage vine gold bangles (pair)) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/keyframes/s03.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/08c9908aee88/clips/s03.mp4",
+      "qa_score": 0.9396532773971558,
+      "qa_attempts": 1
+    }
+  ]
+}

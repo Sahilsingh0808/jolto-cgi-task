@@ -1,0 +1,63 @@
+{
+  "concept": "Close Geometry: A hyper-stylized exploration of the Blossom lattice diamond pendant's intricate design, highlighting its precision, brilliance, and luxurious materials in a serene, dawn-lit atelier setting.",
+  "product": {
+    "image_path": "/private/var/folders/1x/qnnygnts6md4zr773y_db5xc0000gn/T/jolto-4e3e34371006-d4dciwsk/product.jpg",
+    "name": "Blossom lattice diamond pendant",
+    "material": "18k yellow gold pendant with cluster-set and channel-set round brilliant diamonds, two-tone box chain with platinum bead accents",
+    "notes": "teardrop gold frame, seven-stone diamond flower at the crown, stepped diamond lattice across the lower curves, polished finish, hangs from a gold box chain interspersed with platinum beads"
+  },
+  "style": {
+    "palette": "deep obsidian black with warm amber highlights",
+    "lighting": "single soft rim light from upper-left, controlled specular on metal, clean shadow falloff",
+    "mood": "quiet, patient, expensive; the stillness of an empty gallery",
+    "environment": "abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes",
+    "grade": "high-contrast cinematic, subtle film grain, warm black point"
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "order": 1,
+      "duration_s": 7.0,
+      "framing": "extreme_close_up",
+      "camera": "dolly_in",
+      "intent": "To intimately introduce the intricate diamond work and gold architecture, inviting the viewer into its precise construction.",
+      "scene_description": "A warm, low-angle light illuminates the seven-stone diamond flower and the stepped lattice of the 18k yellow gold pendant. Each diamond facet is crisp and sparkling, while the polished gold curves reflect soft highlights, with the gold box chain softly blurred in the foreground and background.",
+      "frame_prompt": "extreme macro close-up of the Blossom lattice diamond pendant, 18k yellow gold pendant with cluster-set and channel-set round brilliant diamonds, two-tone box chain with platinum bead accents. A warm, low-angle light illuminates the seven-stone diamond flower and the stepped lattice of the 18k yellow gold pendant. Each diamond facet is crisp and sparkling, while the polished gold curves reflect soft highlights, with the gold box chain softly blurred in the foreground and background. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, wider composition with negative space, product centred. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow cinematic dolly-in toward the product; the frame tightens continuously. The product (Blossom lattice diamond pendant) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/keyframes/s01.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/clips/s01.mp4",
+      "qa_score": 0.9151821732521057,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s02",
+      "order": 2,
+      "duration_s": 7.0,
+      "framing": "close_up",
+      "camera": "orbit_right",
+      "intent": "To dynamically reveal the pendant's brilliance and the rich luster of its gold as light gracefully plays across its surfaces.",
+      "scene_description": "The pendant slowly orbits in a controlled environment, catching warm, dawn-like light that rolls along the teardrop gold frame, creating a crisp specular highlight, and causing the cluster and lattice diamonds to emit precise, pin-sharp sparks of light.",
+      "frame_prompt": "close-up product shot of the Blossom lattice diamond pendant, 18k yellow gold pendant with cluster-set and channel-set round brilliant diamonds, two-tone box chain with platinum bead accents. The pendant slowly orbits in a controlled environment, catching warm, dawn-like light that rolls along the teardrop gold frame, creating a crisp specular highlight, and causing the cluster and lattice diamonds to emit precise, pin-sharp sparks of light. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, three-quarter view from the left, prepared for a rightward orbit. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow smooth arc of the camera orbiting to the right around the product. The product (Blossom lattice diamond pendant) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/keyframes/s02.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/clips/s02.mp4",
+      "qa_score": 0.8463003635406494,
+      "qa_attempts": 1
+    },
+    {
+      "id": "s03",
+      "order": 3,
+      "duration_s": 6.0,
+      "framing": "medium",
+      "camera": "dolly_out",
+      "intent": "To showcase the elegant form of the entire pendant, emphasizing its suspension and the subtle interplay of the two-tone chain.",
+      "scene_description": "The full Blossom lattice diamond pendant, precisely suspended, is revealed. The two-tone gold box chain, interspersed with platinum beads, curves gracefully around the pendant, creating a refined negative space against a soft, diffused background, bathed in warm, even light.",
+      "frame_prompt": "medium product shot with environment of the Blossom lattice diamond pendant, 18k yellow gold pendant with cluster-set and channel-set round brilliant diamonds, two-tone box chain with platinum bead accents. The full Blossom lattice diamond pendant, precisely suspended, is revealed. The two-tone gold box chain, interspersed with platinum beads, curves gracefully around the pendant, creating a refined negative space against a soft, diffused background, bathed in warm, even light. Environment: abstract matte black surface with faint warm atmospheric haze and slow-drifting dust motes. Lighting: single soft rim light from upper-left, controlled specular on metal, clean shadow falloff. Palette: deep obsidian black with warm amber highlights. Mood: quiet, patient, expensive; the stillness of an empty gallery. Grade: high-contrast cinematic, subtle film grain, warm black point. Composition hint: wide 16:9 cinematic composition, room for atmosphere around the subject, tight product framing, room for the camera to pull back. Photorealistic CGI render, 35mm equivalent, high detail on metal and stones, crisp specular highlights, no text, no watermark, no human subject.",
+      "motion_prompt": "slow cinematic dolly-out pulling away from the product. The product (Blossom lattice diamond pendant) remains in frame and in focus throughout. Subtle particle and light movement is welcome; no character appears; no cuts; consistent lighting and colour grade across the clip.",
+      "keyframe_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/keyframes/s03.jpg",
+      "clip_path": "/Users/sahilsingh/Codebase/jolto-task/runs/4e3e34371006/clips/s03.mp4",
+      "qa_score": 0.9070155620574951,
+      "qa_attempts": 1
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-04-22T00:33:53.246308Z",
+  "records": [
+    {
+      "stage": "brief",
+      "model": "gemini-2.5-flash",
+      "units": 1,
+      "unit_cost_usd": 0.01
+    },
+    {
+      "stage": "frame",
+      "model": "fal-ai/flux-pro/kontext",
+      "units": 1,
+      "unit_cost_usd": 0.04
+    },
+    {
+      "stage": "frame",
+      "model": "fal-ai/flux-pro/kontext",
+      "units": 1,
+      "unit_cost_usd": 0.04
+    },
+    {
+      "stage": "frame",
+      "model": "fal-ai/flux-pro/kontext",
+      "units": 1,
+      "unit_cost_usd": 0.04
+    },
+    {
+      "stage": "video",
+      "model": "fal-ai/kling-video/v1.6/standard/image-to-video",
+      "units": 1,
+      "unit_cost_usd": 0.3
+    },
+    {
+      "stage": "video",
+      "model": "fal-ai/kling-video/v1.6/standard/image-to-video",
+      "units": 1,
+      "unit_cost_usd": 0.3
+    },
+    {
+      "stage": "video",
+      "model": "fal-ai/kling-video/v1.6/standard/image-to-video",
+      "units": 1,
+      "unit_cost_usd": 0.3
+    }
+  ],
+  "total_usd": 1.03
+}

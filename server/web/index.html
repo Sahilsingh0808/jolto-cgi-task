@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Jolto — CGI jewellery ad pipeline</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="topbar-left">
+          <a class="brand" href="/">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-text">Jolto</span>
+            <span class="brand-sub">CGI jewellery pipeline</span>
+          </a>
+          <nav class="nav" aria-label="primary">
+            <a class="nav-link" href="/" data-nav="make">Make</a>
+            <a class="nav-link" href="/history" data-nav="history">History</a>
+          </nav>
+        </div>
+        <div class="topbar-meta">
+          <span id="env-status" class="env-status">checking credentials…</span>
+        </div>
+      </header>
+
+      <main class="stage">
+        <!-- STAGE 1: INPUT -->
+        <section id="view-input" class="view view-active">
+          <div class="hero">
+            <h1 class="hero-title">Brief in. Film out.</h1>
+            <p class="hero-sub">
+              Upload a product photograph and a creative brief. We plan the
+              shot list, preserve product identity across frames, animate each
+              keyframe, and stitch a finished ad.
+            </p>
+          </div>
+
+          <form id="run-form" class="card form" enctype="multipart/form-data">
+            <div class="form-grid">
+              <section class="field field-dropzone">
+                <label class="field-label" for="product-file">
+                  <span>Product photograph</span>
+                  <span class="field-hint">JPEG or PNG, ideally square</span>
+                </label>
+                <div id="dropzone" class="dropzone" tabindex="0">
+                  <input
+                    id="product-file"
+                    type="file"
+                    name="product"
+                    accept="image/jpeg,image/png,image/webp"
+                    required
+                  />
+                  <div class="dropzone-empty">
+                    <i data-lucide="image-up" class="icon-lg"></i>
+                    <span class="dropzone-primary">Drop image or click to browse</span>
+                    <span class="dropzone-secondary">max 10 MB</span>
+                  </div>
+                  <div class="dropzone-preview" hidden>
+                    <img id="dropzone-img" alt="product preview" />
+                    <button type="button" class="dropzone-clear" id="dropzone-clear" aria-label="remove image">
+                      <i data-lucide="x"></i>
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <div class="field-column">
+                <section class="field">
+                  <label class="field-label" for="product-name">
+                    <span>Product name</span>
+                  </label>
+                  <input
+                    id="product-name"
+                    name="product_name"
+                    type="text"
+                    placeholder="Aria solitaire ring"
+                    required
+                  />
+                </section>
+
+                <section class="field">
+                  <label class="field-label" for="product-material">
+                    <span>Material</span>
+                  </label>
+                  <input
+                    id="product-material"
+                    name="product_material"
+                    type="text"
+                    placeholder="18k yellow gold with round brilliant-cut diamond"
+                    required
+                  />
+                </section>
+
+                <section class="field">
+                  <label class="field-label" for="product-notes">
+                    <span>Notes</span>
+                    <span class="field-hint">optional</span>
+                  </label>
+                  <input
+                    id="product-notes"
+                    name="product_notes"
+                    type="text"
+                    placeholder="polished finish, prong-set stone, thin band"
+                  />
+                </section>
+              </div>
+            </div>
+
+            <section class="field field-full">
+              <label class="field-label" for="brief">
+                <span>Creative brief</span>
+                <span class="field-hint">markdown supported</span>
+              </label>
+              <textarea
+                id="brief"
+                name="brief"
+                rows="10"
+                placeholder="Tone, feeling, references, what to avoid…"
+                required
+              ></textarea>
+            </section>
+
+            <section class="options">
+              <div class="options-grid">
+                <div class="segmented" data-name="aspect_ratio" data-default="16:9">
+                  <span class="segmented-label">Aspect</span>
+                  <div class="segmented-controls" role="tablist" aria-label="Aspect ratio">
+                    <button type="button" class="segmented-option" data-value="16:9">16:9</button>
+                    <button type="button" class="segmented-option" data-value="9:16">9:16</button>
+                    <button type="button" class="segmented-option" data-value="1:1">1:1</button>
+                  </div>
+                </div>
+
+                <div class="segmented" data-name="duration" data-default="15">
+                  <span class="segmented-label">Duration</span>
+                  <div class="segmented-controls" role="tablist" aria-label="Target duration">
+                    <button type="button" class="segmented-option" data-value="10">10s</button>
+                    <button type="button" class="segmented-option" data-value="15">15s</button>
+                    <button type="button" class="segmented-option" data-value="20">20s</button>
+                  </div>
+                </div>
+
+                <div class="segmented" data-name="aesthetic" data-default="cinematic">
+                  <span class="segmented-label">Aesthetic</span>
+                  <div class="segmented-controls" role="tablist" aria-label="Aesthetic preset">
+                    <button type="button" class="segmented-option" data-value="cinematic">Cinematic</button>
+                    <button type="button" class="segmented-option" data-value="editorial">Editorial</button>
+                    <button type="button" class="segmented-option" data-value="minimal">Minimal</button>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="aspect_ratio" id="opt-aspect_ratio" value="16:9" />
+              <input type="hidden" name="duration" id="opt-duration" value="15" />
+              <input type="hidden" name="aesthetic" id="opt-aesthetic" value="cinematic" />
+            </section>
+
+            <section class="backends">
+              <div class="backends-header">
+                <span class="backends-title">Backends</span>
+                <button type="button" id="backends-toggle" class="link-button">
+                  <i data-lucide="sliders-horizontal"></i>
+                  <span>advanced</span>
+                </button>
+              </div>
+              <div id="backends-body" class="backends-body" hidden>
+                <div class="field">
+                  <label class="field-label" for="frame-model">
+                    <span>Frame generator</span>
+                  </label>
+                  <select id="frame-model" name="frame_model"></select>
+                </div>
+                <div class="field">
+                  <label class="field-label" for="video-model">
+                    <span>Image-to-video</span>
+                  </label>
+                  <select id="video-model" name="video_model"></select>
+                </div>
+              </div>
+            </section>
+
+            <footer class="form-footer">
+              <span class="form-footer-estimate" id="cost-estimate"></span>
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i data-lucide="sparkles"></i>
+                <span>Generate ad</span>
+              </button>
+            </footer>
+          </form>
+
+          <aside class="preset-row">
+            <button type="button" class="link-button" id="preset-demo">
+              <i data-lucide="wand-sparkles"></i>
+              <span>Fill the example brief</span>
+            </button>
+          </aside>
+        </section>
+
+        <!-- STAGE 2: RUNNING -->
+        <section id="view-run" class="view">
+          <div class="run-header">
+            <div>
+              <div class="run-eyebrow" id="run-eyebrow">generating</div>
+              <h1 class="hero-title" id="run-title">Your ad is being made.</h1>
+              <p class="hero-sub" id="run-sub">
+                This typically takes two to three minutes end to end.
+              </p>
+            </div>
+            <button id="cancel-btn" type="button" class="btn btn-ghost" hidden>
+              <i data-lucide="x"></i><span>Cancel</span>
+            </button>
+          </div>
+
+          <section class="card stages-card">
+            <ol class="stages" id="stages-list">
+              <li data-stage="brief">
+                <span class="stage-dot"><i data-lucide="file-text"></i></span>
+                <span class="stage-label">Parse brief</span>
+                <span class="stage-status">waiting</span>
+              </li>
+              <li data-stage="plan">
+                <span class="stage-dot"><i data-lucide="list-ordered"></i></span>
+                <span class="stage-label">Plan shots</span>
+                <span class="stage-status">waiting</span>
+              </li>
+              <li data-stage="frames">
+                <span class="stage-dot"><i data-lucide="aperture"></i></span>
+                <span class="stage-label">Generate keyframes</span>
+                <span class="stage-status">waiting</span>
+              </li>
+              <li data-stage="video">
+                <span class="stage-dot"><i data-lucide="film"></i></span>
+                <span class="stage-label">Image-to-video</span>
+                <span class="stage-status">waiting</span>
+              </li>
+              <li data-stage="stitch">
+                <span class="stage-dot"><i data-lucide="layers"></i></span>
+                <span class="stage-label">Stitch</span>
+                <span class="stage-status">waiting</span>
+              </li>
+            </ol>
+          </section>
+
+          <section class="two-col">
+            <div class="card panel panel-keyframes">
+              <div class="panel-header">
+                <h2 class="panel-title">Keyframes</h2>
+                <span class="panel-meta" id="keyframes-meta"></span>
+              </div>
+              <div id="keyframes-grid" class="keyframes-grid">
+                <div class="keyframes-empty">
+                  <i data-lucide="image"></i>
+                  <span>frames will appear here as they land</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card panel panel-logs">
+              <div class="panel-header">
+                <h2 class="panel-title">Log</h2>
+                <span class="panel-meta">
+                  <i data-lucide="terminal"></i>
+                  <span id="logs-meta">live</span>
+                </span>
+              </div>
+              <pre id="logs" class="logs" aria-live="polite"></pre>
+            </div>
+          </section>
+        </section>
+
+        <!-- STAGE 3: RESULT -->
+        <!-- HISTORY -->
+        <section id="view-history" class="view">
+          <div class="hero">
+            <h1 class="hero-title">Past runs.</h1>
+            <p class="hero-sub">
+              Every generation from this machine, with its shot graph, cost log,
+              and final film. Click a card to inspect the run.
+            </p>
+          </div>
+
+          <div id="history-grid" class="history-grid" aria-live="polite">
+            <div class="history-loading">loading…</div>
+          </div>
+
+          <div id="history-empty" class="history-empty" hidden>
+            <i data-lucide="archive"></i>
+            <span>No past runs yet. Make one from the home page.</span>
+          </div>
+        </section>
+
+        <section id="view-result" class="view">
+          <div class="run-header">
+            <div>
+              <div class="run-eyebrow" id="result-eyebrow">done</div>
+              <h1 class="hero-title" id="result-title">Your ad is ready.</h1>
+              <p class="hero-sub" id="result-sub"></p>
+            </div>
+            <a id="new-run-btn" href="/" class="btn btn-primary">
+              <i data-lucide="rotate-cw"></i><span>New run</span>
+            </a>
+          </div>
+
+          <section class="result-grid">
+            <div class="card video-card">
+              <video id="result-video" controls playsinline></video>
+              <div class="video-meta" id="video-meta"></div>
+            </div>
+
+            <div class="card summary-card">
+              <div class="summary-row">
+                <span class="summary-label">Cost</span>
+                <span class="summary-value" id="summary-cost">—</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Shots</span>
+                <span class="summary-value" id="summary-shots">—</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Backends</span>
+                <span class="summary-value" id="summary-backends">—</span>
+              </div>
+              <div class="summary-actions">
+                <a id="download-video" class="btn btn-ghost" download>
+                  <i data-lucide="download"></i><span>Final MP4</span>
+                </a>
+                <a id="download-graph" class="btn btn-ghost" download target="_blank" rel="noopener">
+                  <i data-lucide="code-2"></i><span>Shot graph</span>
+                </a>
+                <a id="download-cost" class="btn btn-ghost" download target="_blank" rel="noopener">
+                  <i data-lucide="receipt"></i><span>Cost log</span>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section class="card panel panel-keyframes">
+            <div class="panel-header">
+              <h2 class="panel-title">Shots</h2>
+            </div>
+            <div id="result-shots" class="keyframes-grid"></div>
+          </section>
+
+          <section id="result-error" class="card error-card" hidden>
+            <div class="error-head">
+              <i data-lucide="alert-octagon"></i>
+              <span>Run failed</span>
+            </div>
+            <pre id="error-detail" class="logs"></pre>
+          </section>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Jolto engineering assignment · CGI pipeline</span>
+      </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

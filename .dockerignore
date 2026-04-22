@@ -1,0 +1,33 @@
+.git/
+.github/
+.venv/
+venv/
+env/
+.env
+*.env.local
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Keep examples/ so the sample brief + product image ship with the image.
+# runs/ is large and recreated on every run; the docker-compose volume mount
+# gives persistence in deployment.
+runs/
+
+dist/
+build/
+*.egg-info/
+
+.DS_Store
+.idea/
+.vscode/
+
+# Don't ship documentation / plan files in the runtime image.
+docs/
+*.md
+!README.md
